@@ -1,6 +1,6 @@
-CREATE DATABASE L3;
+CREATE DATABASE  L3;
 USE L3;
-CREATE TABLE `manuf` (
+CREATE TABLE  `manuf` (
 `IDM` int PRIMARY KEY,  
 `name` varchar(20),  
 `city` varchar(20));
@@ -11,7 +11,7 @@ INSERT INTO `manuf` VALUES
 (4,'seagete','Cupertino'),
 (5,'Asus','Taipei'),
 (6,'Dell','Round Rock');
-CREATE TABLE `cpu` (
+CREATE TABLE  `cpu` (
 `IDC` int PRIMARY KEY ,
 `IDM` int,
 `Name` varchar(20),
@@ -22,7 +22,7 @@ INSERT INTO `cpu` VALUES
 (3,2,'Ryzen 5',3.20),
 (4,2,'Ryzen 7',4.70),
 (5,NULL,'Power9',3.50);
-CREATE TABLE `hdisk` (
+CREATE TABLE  `hdisk` (
 `IDD` int PRIMARY KEY,
 `IDM` int,
 `Name` varchar(20),
@@ -33,7 +33,7 @@ INSERT INTO `hdisk` VALUES
 (2,3,'Black','ssd',256),
 (3,1,'6000p','ssd',256),
 (4,1,'Optane','ssd',16);
-CREATE TABLE `nb` (
+CREATE TABLE  `nb` (
 `IDN` int PRIMARY KEY,
 `IDM` int,
 `Name` varchar(20),
@@ -116,6 +116,14 @@ left join Manuf on nb.IDM = Manuf.IDM
 left join Cpu on nb.IDC = cpu.IDC
 left join hdisk on nb.IDD = hdisk.IDD;
 
+select nb.name as NBname, manuf.name  as MANUFname, cpu.name as CPUname, MC.name as CPUmanuf, hdisk.name as DISKname, MD.name as DISKmanuf
+from nb
+left join manuf on nb.IDM = manuf.IDM
+left join cpu on nb.IDC = cpu.IDC
+left join manuf as MC on MC.IDM = cpu.IDM
+left join hdisk on nb.IDD = hdisk.IDD
+left join manuf as MD on MD.IDM = hdisk.IDM;
+
 -- 14	Вывести абсолютно все названия фирм в первом поле и все моделей процессоров во втором
 -- Решение:
 select Manuf.name, cpu.name from Manuf
@@ -131,6 +139,12 @@ select Manuf.name from Manuf
 where ((select count(*) from cpu where IDM = Manuf.IDM)>0 and  (select count(*) from hdisk where IDM = Manuf.IDM)>0)
  or ((select count(*) from cpu where IDM = Manuf.IDM)>0 and  (select count(*) from nb where IDM = Manuf.IDM)>0)
  or ((select count(*) from hdisk where IDM = Manuf.IDM)>0 and  (select count(*) from nb where IDM = Manuf.IDM)>0);
+
+select distinct Manuf.name from Manuf
+left join cpu on Manuf.IDM = cpu.IDM 
+left join hdisk on Manuf.IDM = hdisk.IDM
+left join nb on Manuf.IDM = nb.IDM
+where (cpu.name is not NULL and hdisk.name is not NULL) or (cpu.name is not NULL and nb.name is not NULL) or (nb.name is not NULL and hdisk.name is not NULL);
 
 
 
